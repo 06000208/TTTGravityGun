@@ -1,0 +1,9 @@
+{
+	"title"		:	"TTT Gravity Gun",
+	"type"		:	"weapon",
+	"tags"		:	["fun"],
+	"ignore"	:
+	[
+		"*.bsp"
+	]
+}
