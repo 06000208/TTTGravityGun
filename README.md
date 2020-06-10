@@ -1,8 +1,8 @@
 # TTT Gravity Gun
 
-The classic Half life [Gravity Gun](https://half-life.fandom.com/wiki/Zero_Point_Energy_Field_Manipulator) as a [trouble in terrorist town](http://ttt.badking.net/) weapon. Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url].
+The classic half life [Gravity Gun](https://half-life.fandom.com/wiki/Zero_Point_Energy_Field_Manipulator) as a [trouble in terrorist town](http://ttt.badking.net/) weapon. Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url].
 
-Includes shop/weapon icon compliant with the vanilla ttt icon design.
+Shop icon is compliant with vanilla weapon icon design.
 
 # Gameplay Mechanics
 

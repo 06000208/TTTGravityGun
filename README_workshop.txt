@@ -1,6 +1,6 @@
-The classic Half life Gravity Gun as a trouble in terrorist town weapon. Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url].
+The classic half life Gravity Gun as a trouble in terrorist town weapon. Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url].
 
-Includes shop & weapon icon compliant with the vanilla ttt icon design.
+Shop icon is compliant with vanilla weapon icon design.
 
 [h1]Gameplay Mechanics[/h1]
 [quote=TTT Shop]A tractor beam-type weapon, originally designed for handling hazardous materials...[/quote] 
