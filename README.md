@@ -30,4 +30,4 @@ https://steamcommunity.com/sharedfiles/filedetails/?id=1414206909
 
 Addon adopted from [MKA0207](https://steamcommunity.com/profiles/76561197996267438) with permission, full credit to them for the original addon and a majority of the code!
 
-<img src="https://github.com/0600208/ttt-gravity-gun/blob/master/permission.png?raw=true" alt="Permission" title="Permission">
+<img src="https://raw.githubusercontent.com/06000208/ttt-gravity-gun/master/permission.png" alt="Permission" title="Permission">
