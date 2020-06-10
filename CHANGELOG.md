@@ -6,6 +6,7 @@
 - Improved shop icon
 - Changed shop icon format from png to vtf
 - Rewrote some of the past change notes to be more clear
+- No longer purchasable more than once
 
 ### `v1.2` Jun 18, 2018 @ 9:35am 
 
