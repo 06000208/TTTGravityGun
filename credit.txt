@@ -1,0 +1,11 @@
+Credit goes to MKA0207 for the original addon and a majority of the code:
+https://steamcommunity.com/profiles/76561197996267438
+
+Currently maintained by 06000208: 
+https://steamcommunity.com/profiles/76561198077168160 
+
+Workshop Addon:
+https://steamcommunity.com/sharedfiles/filedetails/?id=1414206909
+
+Repository:
+https://github.com/06000208/ttt-gravity-gun
