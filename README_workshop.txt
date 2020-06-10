@@ -1,20 +1,26 @@
-A gravity gun for the terrortown gamemode.
-This is an edit of [url=https://steamcommunity.com/id/mka0207]mka0207[/url]'s [url=https://steamcommunity.com/sharedfiles/filedetails/?id=224881520]ttt gravity gun[/url] addon that i made for a server.
-[h1]Full credit to them for the vast majority of the code.[/h1]
+The classic Half life Gravity Gun as a trouble in terrorist town weapon. Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url].
 
-[u]The changes between mine and their version are listed below[/u], [b]although this list may be incomplete.[/b]
+Includes shop & weapon icon compliant with the vanilla ttt icon design.
 
-fixed: incorrectly being an automatic weapon/being able to spam/hold down attack
-fixed: and the subsequent "no ammo" sound spam if you're out and try to use it of the above
-fixed: incorrect skin between viewmodel and worldmodel, both are now the normal orange gravity gun
-fixed: incorrect HoldType (changed from ar2 to physgun)
-fixed: SWEP.WeaponID which shouldn't have been in there
-fixed: several entities such as prop_physics_respawnable not working
-added: many ttt specific entities are now able to be picked up
-changed: punt force (lowered)
-changed: max mass of grab able objects (raised)
-changed: slot (takes up slot 8 now)
-changed: weapon kind to WEAPON_EQUIP2
-changed: description
-changed: shop icon
-changed: canbuy (both role_traitor and role_detective)
+[h1]Gameplay Mechanics[/h1]
+[quote=TTT Shop]A tractor beam-type weapon, originally designed for handling hazardous materials...[/quote] 
+[list]
+  [*] Available to both detectives and traitors from the shop
+  [*] Right click pulls entities towards you, and within a certain range, begins holding them
+  [*] Right clicking while holding something will drop it and consume 1 ammo, out of 10 initial non-renewable ammo
+  [*] Left click will punt the prop in the direction you're looking and consume 1 ammo
+[/list]
+
+[h1]Planned[/h1]
+[list]
+  [*] Mechanics overhaul & balance changes
+  [*] Visuals & aesthetics rework
+[/list]
+
+[h1]Source Code, Issues, Suggestions[/h1]
+You can find the source code in the github repository: https://github.com/06000208/ttt-gravity-gun
+
+If you have any errors, issues, etc. with the addon or any suggestions like balance changes, feel free to post an issue on the [url=https://github.com/06000208/ttt-gravity-gun/issues]issue tracker[/url].
+
+[h1]Credit[/h1]
+Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url] with permission, full credit to them for the original addon and a majority of the code!
