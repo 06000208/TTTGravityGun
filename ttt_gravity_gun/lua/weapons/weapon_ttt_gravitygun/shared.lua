@@ -578,7 +578,7 @@ function SWEP:Pickup()
     self.TP:SetMaterial("Models/effects/vol_light001") --We do this so the can supporting the body is invisible
     self.TP:Spawn()
     self.TP:SetCollisionGroup(COLLISION_GROUP_WORLD)
-    self.TP:SetColor(0,0,0,0)
+    self.TP:SetColor(Color(0,0,0,0))
     self.TP:PointAtEntity(self.Owner)
     self.TP:GetPhysicsObject():SetMass(50000)
     self.TP:GetPhysicsObject():EnableMotion(false)
@@ -633,21 +633,6 @@ function SWEP:Visual()
     effectdata:SetAttachment( 1 )
     effectdata:SetEntity( self.Weapon )
     util.Effect( "ToolTracer", effectdata )
-
-    if (SERVER) then
-        if !self.Muzzle then
-            self.Muzzle = ents.Create("PhyscannonMuzzle")
-            self.Muzzle:SetPos( self.Owner:GetShootPos() )
-            self.Muzzle:Spawn()
-        end
-
-        self.Muzzle:SetParent(self.Owner)
-        self.Muzzle:SetOwner(self.Owner)
-
-        timer.Simple( 0.12, function()
-            self:RemoveMuzzle()
-        end )
-    end
 
     local e = EffectData()
     e:SetMagnitude(30)
@@ -719,13 +704,6 @@ function SWEP:TPrem()
     if self.Const then
         self.Const:Remove()
         self.Const = nil
-    end
-end
-
-function SWEP:RemoveMuzzle()
-    if self.Muzzle then
-        self.Muzzle:Remove()
-        self.Muzzle = nil
     end
 end
 
