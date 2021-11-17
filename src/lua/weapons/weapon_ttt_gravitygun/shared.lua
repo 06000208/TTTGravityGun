@@ -1,75 +1,85 @@
--- Credit goes to MKA0207 for the original addon and a majority of the code: https://steamcommunity.com/profiles/76561197996267438
+-- Credit goes to MKA0207 for the original addon: https://steamcommunity.com/profiles/76561197996267438
 -- Currently maintained by 06000208: https://steamcommunity.com/profiles/76561198077168160
 -- Workshop Addon: https://steamcommunity.com/sharedfiles/filedetails/?id=1414206909
 -- Repository: https://github.com/06000208/ttt-gravity-gun
--- Version: 1.3
+-- Version: 1.4
+
+-- Files & initialization
 
 AddCSLuaFile()
+
+DEFINE_BASECLASS( "weapon_tttbase" ) -- https://wiki.facepunch.com/gmod/Global.DEFINE_BASECLASS
 
 if SERVER then
     resource.AddFile("materials/vgui/ttt/icon_06000208_gravity_gun.vmt")
 end
 
+-- REVIEW: Why on earth is this precached?
+util.PrecacheModel("models/props_c17/canisterchunk01b.mdl")
+
+-- SWEP Basics
 SWEP.Base = "weapon_tttbase"
-SWEP.HoldType = "physgun"
-SWEP.Kind = WEAPON_EQUIP2
-
-if CLIENT then
-    SWEP.PrintName = "Gravity Gun"
-    SWEP.Slot = 7
-
-    SWEP.EquipMenuData = {
-        type = "item_weapon",
-        desc = "A tractor beam-type weapon, originally\ndesigned for handling hazardous materials...\n\nAllows to you move and punt large props"
-    };
-
-    SWEP.Icon = "vgui/ttt/icon_06000208_gravity_gun"
-end
-
-SWEP.CanBuy = {ROLE_TRAITOR, ROLE_DETECTIVE}
-SWEP.LimitedStock = true
-
+SWEP.PrintName = "Gravity Gun"
 SWEP.Spawnable = true
-SWEP.AdminSpawnable = true
+SWEP.AdminOnly = false
+SWEP.Author = "06000208 and MKA0207"
+SWEP.Contact = "https://github.com/06000208/ttt-gravity-gun/issues"
 
-SWEP.UseHands = true
-SWEP.ViewModel = "models/weapons/c_physcannon.mdl"
-SWEP.WorldModel = "models/weapons/w_physics.mdl"
-SWEP.ViewModelFlip = false
-SWEP.ViewModelFOV = 57
-SWEP.Weight = 42
-
+-- SWEP Weapon Variables
+SWEP.Kind = WEAPON_EQUIP2
+SWEP.Slot = 7
 SWEP.AutoSwitchTo = true
 SWEP.AutoSwitchFrom = true
-
+SWEP.Weight = 5 -- Controls the autoswitch weight (default = 5)
+SWEP.DrawAmmo = true
+SWEP.DeploySpeed = 1.4 -- Default
+-- Refillable ammo (SWEP.AmmoEnt) is not used
+SWEP.Primary.Ammo = "xbowbolt"
 SWEP.Primary.ClipSize = 10
 SWEP.Primary.DefaultClip = 10
 SWEP.Primary.Automatic = false
-SWEP.Primary.Ammo = "xbowbolt"
-
+SWEP.Secondary.Ammo = "xbowbolt"
 SWEP.Secondary.ClipSize = 10
 SWEP.Secondary.DefaultClip = 10
 SWEP.Secondary.Automatic = false
-SWEP.Secondary.Ammo = "xbowbolt"
 
+-- SWEP Model
+SWEP.HoldType = "physgun"
+SWEP.UseHands = true
+SWEP.ViewModelFOV = 57
+SWEP.ViewModel = "models/weapons/c_physcannon.mdl"
+SWEP.WorldModel = "models/weapons/w_physics.mdl"
+
+-- TTT Shop Variables
+SWEP.CanBuy = {ROLE_TRAITOR, ROLE_DETECTIVE}
+SWEP.LimitedStock = true
+SWEP.EquipMenuData = {
+    type = "item_weapon",
+    desc = "A tractor beam-type weapon, originally\ndesigned for handling hazardous materials...\n\nAllows to you move and punt large props"
+};
+SWEP.Icon = "vgui/ttt/icon_06000208_gravity_gun"
+
+-- Custom variables
 SWEP.PuntForce = 90000
 SWEP.PullForce = 2000
 SWEP.MaxMass = 700
 SWEP.MaxPuntRange = 1055
 SWEP.MaxPickupRange = 855
 SWEP.Distance = 60
-
 local HoldSound = Sound("Weapon_MegaPhysCannon.HoldSound")
 
-util.PrecacheModel("models/props_c17/canisterchunk01b.mdl")
-
+-- This method overrides weapon_tttbase's Initialize()
+-- https://wiki.facepunch.com/gmod/WEAPON:Initialize
 function SWEP:Initialize()
+    -- Intentionally doesn't call BaseClass.Initialize(Self)
     if SERVER then
-        self:SetSkin(0)
+        self:SetSkin(0) -- Orange Gravity Gun
     end
-    self:SetWeaponHoldType( self.HoldType )
+    self:SetHoldType(self.HoldType)
+    self:SetDeploySpeed(self.DeploySpeed)
 end
 
+-- https://wiki.facepunch.com/gmod/WEAPON:OwnerChanged
 function SWEP:OwnerChanged()
     self:SetSkin(0)
     self:TPrem()
@@ -78,33 +88,36 @@ function SWEP:OwnerChanged()
     end
 end
 
+-- This method overrides weapontttbase's Think()
+-- https://wiki.facepunch.com/gmod/WEAPON:Think
 function SWEP:Think()
-    local trace = self.Owner:GetEyeTrace()
+    BaseClass.Think(Self)
+    local trace = self:GetOwner():GetEyeTrace()
     local tgt = trace.Entity
 
     --[[
-    if math.random(  6,  98 ) == 16 and !self.TP and !self.Owner:KeyDown(IN_ATTACK2) and !self.Owner:KeyDown(IN_ATTACK) then
+    if math.random(  6,  98 ) == 16 and !self.TP and !self:GetOwner():KeyDown(IN_ATTACK2) and !self:GetOwner():KeyDown(IN_ATTACK) then
     --    self:ZapEffect()
     end
     ]]
 
-    if self.Owner:KeyPressed(IN_ATTACK2) then
+    if self:GetOwner():KeyPressed(IN_ATTACK2) then
         -- self:GlowEffect()
         self:RemoveCore()
-    elseif self.Owner:KeyReleased(IN_ATTACK2) and !self.TP then
+    elseif self:GetOwner():KeyReleased(IN_ATTACK2) and !self.TP then
         self:RemoveGlow()
         -- self:CoreEffect()
     end
 
-    if !self.Owner:KeyDown(IN_ATTACK) then
-        self.Weapon:SetNextPrimaryFire( CurTime() - 0.55 );
+    if !self:GetOwner():KeyDown(IN_ATTACK) then
+        self:SetNextPrimaryFire( CurTime() - 0.55 );
     end
 
-    if self.Owner:KeyPressed(IN_ATTACK2) then
+    if self:GetOwner():KeyPressed(IN_ATTACK2) then
         if self.HP then return end
 
         if !tgt or !tgt:IsValid() then
-            self.Weapon:EmitSound("Weapon_PhysCannon.TooHeavy")
+            self:EmitSound("Weapon_PhysCannon.TooHeavy")
             return
         end
 
@@ -112,11 +125,11 @@ function SWEP:Think()
             if tgt:GetMoveType() == MOVETYPE_VPHYSICS then
                 local Mass = tgt:GetPhysicsObject():GetMass()
                 if Mass >= (self.MaxMass + 1) then
-                    self.Weapon:EmitSound("Weapon_PhysCannon.TooHeavy")
+                    self:EmitSound("Weapon_PhysCannon.TooHeavy")
                     return
                 end
             else
-                self.Weapon:EmitSound("Weapon_PhysCannon.TooHeavy")
+                self:EmitSound("Weapon_PhysCannon.TooHeavy")
                 return
             end
         end
@@ -126,21 +139,21 @@ function SWEP:Think()
         if self.HP and self.HP != NULL then
             if (SERVER) then
                 HPrad = self.HP:BoundingRadius()
-                self.TP:SetPos(self.Owner:GetShootPos() + self.Owner:GetAimVector() * (self.Distance + HPrad))
-                self.TP:PointAtEntity(self.Owner)
+                self.TP:SetPos(self:GetOwner():GetShootPos() + self:GetOwner():GetAimVector() * (self.Distance + HPrad))
+                self.TP:PointAtEntity(self:GetOwner())
 
                 self.HP:GetPhysicsObject():Wake()
             end
         else
-            self.Weapon:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
-            self.Owner:SetAnimation( PLAYER_ATTACK1 )
+            self:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
+            self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
 
             self.Secondary.Automatic = true
-            self.Weapon:SetNextSecondaryFire( CurTime() + 0.5 );
-            self.Weapon:EmitSound("Weapon_MegaPhysCannon.Drop")
+            self:SetNextSecondaryFire( CurTime() + 0.5 );
+            self:EmitSound("Weapon_MegaPhysCannon.Drop")
 
             timer.Simple( 0.4, function()
-                self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+                self:SendWeaponAnim(ACT_VM_IDLE)
             end )
 
             -- self:CoreEffect()
@@ -155,17 +168,18 @@ function SWEP:Think()
                 self.HP = nil
             end
 
-            self.Weapon:StopSound(HoldSound)
+            self:StopSound(HoldSound)
         end
 
-        if CurTime() >= PropLockTime and (self.HP:GetPos() - (self.Owner:GetShootPos() + self.Owner:GetAimVector() * (self.Distance + HPrad))):Length() >= 80 then
-            self.Weapon:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
-            self.Owner:SetAnimation( PLAYER_ATTACK1 )
+        if CurTime() >= PropLockTime and (self.HP:GetPos() - (self:GetOwner():GetShootPos() + self:GetOwner():GetAimVector() * (self.Distance + HPrad))):Length() >= 80 then
+            self:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
+            self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
             self:Drop()
         end
     end
 end
 
+-- REVIEW: Unused function
 function SWEP:ZapEffect()
     if SERVER then
         --[[
@@ -177,15 +191,15 @@ function SWEP:ZapEffect()
             -- self.Zap =  ents.Create("PhyscannonZap3")
         end
         --]]
-        self.Zap:SetPos( self.Owner:GetShootPos() )
+        self.Zap:SetPos( self:GetOwner():GetShootPos() )
         self.Zap:Spawn()
-        self.Zap:SetParent(self.Owner)
-        self.Zap:SetOwner(self.Owner)
+        self.Zap:SetParent(self:GetOwner())
+        self.Zap:SetOwner(self:GetOwner())
     end
 end
 
 function SWEP:NotAllowedClass()
-    local trace = self.Owner:GetEyeTrace()
+    local trace = self:GetOwner():GetEyeTrace()
     local class = trace.Entity:GetClass()
     if class == "npc_strider"
         or class == "npc_helicopter"
@@ -210,7 +224,7 @@ function SWEP:NotAllowedClass()
 end
 
 function SWEP:AllowedClass()
-    local trace = self.Owner:GetEyeTrace()
+    local trace = self:GetOwner():GetEyeTrace()
     local class = trace.Entity:GetClass()
     -- if trace.Entity:GetMoveType() == MOVETYPE_VPHYSICS then
     if class == "npc_manhack"
@@ -351,25 +365,25 @@ function SWEP:AllowedClass()
 end
 
 --[[function SWEP:OpenClaws()
-    self.Weapon:EmitSound("Weapon_MegaPhysCannon.Charge")
-    local Open = self.Weapon:LookupSequence("ProngsOpen")
-    self.Weapon:SetSequence(Open)
+    self:EmitSound("Weapon_MegaPhysCannon.Charge")
+    local Open = self:LookupSequence("ProngsOpen")
+    self:SetSequence(Open)
 end]]
 
 function SWEP:PrimaryAttack()
 
 if !self:CanPrimaryAttack() then return end
-    self.Owner:SetAnimation( ACT_VM_SECONDARYATTACK )
-    self.Weapon:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-    self.Weapon:SetNextPrimaryFire( CurTime() + 0.55 );
-    self.Weapon:SetNextSecondaryFire( CurTime() + 0.3 );
-    self.Owner:ViewPunch( Angle( 0, 6, 0 ) ) --makes the screen shake
-    self.Owner:SetAnimation( PLAYER_ATTACK1 ) --makes our player have thirdperson anims
-    self.Weapon:TakePrimaryAmmo(1)
+    self:GetOwner():SetAnimation( ACT_VM_SECONDARYATTACK )
+    self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
+    self:SetNextPrimaryFire( CurTime() + 0.55 );
+    self:SetNextSecondaryFire( CurTime() + 0.3 );
+    self:GetOwner():ViewPunch( Angle( 0, 6, 0 ) ) --makes the screen shake
+    self:GetOwner():SetAnimation( PLAYER_ATTACK1 ) --makes our player have thirdperson anims
+    self:TakePrimaryAmmo(1)
 
     --[[
     timer.Simple( 0.4, function()
-        self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+        self:SendWeaponAnim(ACT_VM_IDLE)
     end )
     --]]
 
@@ -378,18 +392,18 @@ if !self:CanPrimaryAttack() then return end
         return
     end
 
-    local trace = self.Owner:GetEyeTrace()
+    local trace = self:GetOwner():GetEyeTrace()
     local tgt = trace.Entity
 
-    if !tgt or !tgt:IsValid() or (self.Owner:GetShootPos() - tgt:GetPos()):Length() > self.MaxPuntRange or self:NotAllowedClass() then
-        self.Weapon:EmitSound("Weapon_MegaPhysCannon.DryFire")
+    if !tgt or !tgt:IsValid() or (self:GetOwner():GetShootPos() - tgt:GetPos()):Length() > self.MaxPuntRange or self:NotAllowedClass() then
+        self:EmitSound("Weapon_MegaPhysCannon.DryFire")
         return
     end
 
     if tgt:IsNPC() and !self:AllowedClass() and !self:NotAllowedClass() or tgt:IsPlayer() then
         if (SERVER) then
             if (tgt:IsPlayer() and RunConsoleCommand( "sbox_playershurtplayers" ) == 1) then
-                self.Weapon:EmitSound("Weapon_MegaPhysCannon.DryFire")
+                self:EmitSound("Weapon_MegaPhysCannon.DryFire")
                 return
             end
             local ragdoll = ents.Create( "prop_ragdoll" )
@@ -409,10 +423,10 @@ if !self:CanPrimaryAttack() then return end
 
             if !entity then return end
 
-            cleanup.Add (self.Owner, "props", ragdoll);
+            cleanup.Add (self:GetOwner(), "props", ragdoll);
             undo.Create ("ragdoll");
             undo.AddEntity (ragdoll);
-            undo.SetPlayer (self.Owner);
+            undo.SetPlayer (self:GetOwner());
             undo.Finish();
 
             if tgt:IsPlayer() then
@@ -424,7 +438,7 @@ if !self:CanPrimaryAttack() then return end
                 tgt:Fire("Kill","",0)
             end
 
-            self.Owner:AddFrags(1)
+            self:GetOwner():AddFrags(1)
 
             ragdoll:Spawn()
             ragdoll:Fire("StartRagdollBoogie","",0)
@@ -441,7 +455,7 @@ if !self:CanPrimaryAttack() then return end
                     timer.Simple( 0.01, function()
                         bone:SetPos(bonepos)
                         bone:SetAngle(boneang)
-                        bone:AddVelocity(self.Owner:GetAimVector() * self.PuntForce / 8)
+                        bone:AddVelocity(self:GetOwner():GetAimVector() * self.PuntForce / 8)
                     end )
                 end
             end
@@ -453,9 +467,9 @@ if !self:CanPrimaryAttack() then return end
         self:Visual()
         if (SERVER) then
             local position = trace.HitPos
-            tgt:GetPhysicsObject():ApplyForceCenter(self.Owner:GetAimVector() * self.PuntForce)
-            tgt:GetPhysicsObject():ApplyForceOffset(self.Owner:GetAimVector() * self.PuntForce, position )
-            tgt:SetPhysicsAttacker(self.Owner)
+            tgt:GetPhysicsObject():ApplyForceCenter(self:GetOwner():GetAimVector() * self.PuntForce)
+            tgt:GetPhysicsObject():ApplyForceOffset(self:GetOwner():GetAimVector() * self.PuntForce, position )
+            tgt:SetPhysicsAttacker(self:GetOwner())
             tgt:Fire("physdamagescale","99999",0)
         end
     end
@@ -464,18 +478,18 @@ end
 function SWEP:DropAndShoot()
     self.HP:Fire("EnablePhyscannonPickup","",1)
     self.HP:SetCollisionGroup(COLLISION_GROUP_NONE)
-    self.HP:SetPhysicsAttacker(self.Owner)
+    self.HP:SetPhysicsAttacker(self:GetOwner())
 
     self.Secondary.Automatic = true
-    self.Weapon:SetNextSecondaryFire( CurTime() + 0.5 );
-    self.Weapon:SetNextPrimaryFire( CurTime() + 0.55 );
+    self:SetNextSecondaryFire( CurTime() + 0.5 );
+    self:SetNextPrimaryFire( CurTime() + 0.55 );
 
     -- self:CoreEffect()
     self:RemoveGlow()
     -- self:Visual()
     self:TPrem()
 
-    self.Weapon:StopSound(HoldSound)
+    self:StopSound(HoldSound)
 
     if self.HP:GetClass() == "prop_ragdoll" then
         self.HP:Fire("StartRagdollBoogie","",0)
@@ -486,17 +500,17 @@ function SWEP:DropAndShoot()
 
             if bone and bone.IsValid and bone:IsValid() then
                 timer.Simple( 0.02, function()
-                    bone:AddVelocity(self.Owner:GetAimVector() * self.PuntForce / 8)
+                    bone:AddVelocity(self:GetOwner():GetAimVector() * self.PuntForce / 8)
                 end )
             end
         end
     else
-        local trace = self.Owner:GetEyeTrace()
+        local trace = self:GetOwner():GetEyeTrace()
         local position = trace.HitPos
 
         timer.Simple( 0.02, function()
-            self.HP:GetPhysicsObject():ApplyForceCenter(self.Owner:GetAimVector() * self.PuntForce)
-            self.HP:GetPhysicsObject():ApplyForceOffset(self.Owner:GetAimVector() * self.PuntForce,position )
+            self.HP:GetPhysicsObject():ApplyForceCenter(self:GetOwner():GetAimVector() * self.PuntForce)
+            self.HP:GetPhysicsObject():ApplyForceOffset(self:GetOwner():GetAimVector() * self.PuntForce,position )
         end )
 
         self.HP:Fire("physdamagescale","9999",0)
@@ -511,14 +525,14 @@ function SWEP:SecondaryAttack()
     if !self:CanPrimaryAttack() then return end
 
     if self.TP then
-        self.Weapon:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
-        self.Owner:SetAnimation( PLAYER_ATTACK1 )
-        self.Weapon:TakePrimaryAmmo(1)
+        self:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
+        self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
+        self:TakePrimaryAmmo(1)
         self:Drop()
         return
     end
 
-    local trace = self.Owner:GetEyeTrace()
+    local trace = self:GetOwner():GetEyeTrace()
     local tgt = trace.Entity
 
     if !tgt or !tgt:IsValid() then
@@ -534,7 +548,7 @@ function SWEP:SecondaryAttack()
 
     if tgt:GetMoveType() == MOVETYPE_VPHYSICS and SERVER then
         local Mass = tgt:GetPhysicsObject():GetMass()
-        local Dist = (tgt:GetPos() - self.Owner:GetPos()):Length()
+        local Dist = (tgt:GetPos() - self:GetOwner():GetPos()):Length()
         local vel = self.PullForce / (Dist * 0.002)
 
         if Mass >= (self.MaxMass + 1) then
@@ -543,31 +557,31 @@ function SWEP:SecondaryAttack()
 
         if tgt:GetClass() == "prop_ragdoll" or self:AllowedClass() and tgt:GetPhysicsObject():IsMoveable() and ( !constraint.HasConstraints( tgt ) ) then
             if Dist < self.MaxPickupRange then
-                self.Weapon:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
-                self.Owner:SetAnimation( PLAYER_ATTACK1 )
+                self:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
+                self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
                 self.HP = tgt
 
                 self:Pickup()
-                self.Weapon:SetNextSecondaryFire( CurTime() + 0.2 );
-                self.Weapon:SetNextPrimaryFire( CurTime() + 0.1 );
+                self:SetNextSecondaryFire( CurTime() + 0.2 );
+                self:SetNextPrimaryFire( CurTime() + 0.1 );
                 self.Secondary.Automatic = false
             else
-                tgt:GetPhysicsObject():ApplyForceCenter(self.Owner:GetAimVector() * -vel )
+                tgt:GetPhysicsObject():ApplyForceCenter(self:GetOwner():GetAimVector() * -vel )
             end
         end
     end
 end
 
 function SWEP:Pickup()
-    self.Weapon:EmitSound("Weapon_MegaPhysCannon.Pickup")
+    self:EmitSound("Weapon_MegaPhysCannon.Pickup")
 
     PropLockTime = CurTime() + 1
 
     timer.Simple( 0.4, function()
-        self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
+        self:SendWeaponAnim(ACT_VM_RELOAD)
     end )
 
-    local trace = self.Owner:GetEyeTrace()
+    local trace = self:GetOwner():GetEyeTrace()
 
     self.HP:Fire("DisablePhyscannonPickup","",0)
 
@@ -579,7 +593,7 @@ function SWEP:Pickup()
     self.TP:Spawn()
     self.TP:SetCollisionGroup(COLLISION_GROUP_WORLD)
     self.TP:SetColor(Color(0,0,0,0))
-    self.TP:PointAtEntity(self.Owner)
+    self.TP:PointAtEntity(self:GetOwner())
     self.TP:GetPhysicsObject():SetMass(50000)
     self.TP:GetPhysicsObject():EnableMotion(false)
 
@@ -588,7 +602,7 @@ function SWEP:Pickup()
 
     self.HP:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 
-    self.Weapon:EmitSound(HoldSound)
+    self:EmitSound(HoldSound)
 end
 
 function SWEP:Drop()
@@ -601,12 +615,12 @@ function SWEP:Drop()
     end
 
     self.Secondary.Automatic = true
-    self.Weapon:EmitSound("Weapon_MegaPhysCannon.Drop")
-    self.Weapon:SetNextSecondaryFire( CurTime() + 0.5 );
+    self:EmitSound("Weapon_MegaPhysCannon.Drop")
+    self:SetNextSecondaryFire( CurTime() + 0.5 );
 
     timer.Simple( 0.4,
     function()
-        self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+        self:SendWeaponAnim(ACT_VM_IDLE)
     end )
 
     -- self:CoreEffect()
@@ -617,21 +631,21 @@ function SWEP:Drop()
         self.HP = nil
     end
 
-    self.Weapon:StopSound(HoldSound)
-    self.Weapon:EmitSound( "Weapon_MegaPhysCannon.Launch" )
+    self:StopSound(HoldSound)
+    self:EmitSound( "Weapon_MegaPhysCannon.Launch" )
 end
 
 function SWEP:Visual()
-    self.Weapon:EmitSound( "Weapon_MegaPhysCannon.Launch" )
-    self.Owner:ViewPunch( Angle( -5, 0, 0 ) )
+    self:EmitSound( "Weapon_MegaPhysCannon.Launch" )
+    self:GetOwner():ViewPunch( Angle( -5, 0, 0 ) )
 
-    local trace = self.Owner:GetEyeTrace()
+    local trace = self:GetOwner():GetEyeTrace()
 
     local effectdata = EffectData()
     effectdata:SetOrigin( trace.HitPos )
-    effectdata:SetStart( self.Owner:GetShootPos() )
+    effectdata:SetStart( self:GetOwner():GetShootPos() )
     effectdata:SetAttachment( 1 )
-    effectdata:SetEntity( self.Weapon )
+    effectdata:SetEntity( self )
     util.Effect( "ToolTracer", effectdata )
 
     local e = EffectData()
@@ -668,7 +682,7 @@ function RagdollVisual(ent, val)
 end
 
 function SWEP:Deploy()
-    -- self.Weapon:SendWeaponAnim( ACT_VM_DRAW ) --DRAW animation
+    -- self:SendWeaponAnim( ACT_VM_DRAW ) --DRAW animation
     self:EmitSound("items/battery_pickup.wav")
     self:SetSkin(0)
     -- self:CoreEffect()
@@ -719,30 +733,35 @@ function SWEP:RemoveFX()
     end
 end
 
+-- REVIEW: This function uses a non-existent entity
+-- REVIEW: Unused function, leftover part of unfinished code
 function SWEP:CoreEffect()
     if SERVER then
         if !self.Core then
             self.Core = ents.Create("PhyscannonCore")
-            self.Core:SetPos( self.Owner:GetShootPos() )
+            self.Core:SetPos( self:GetOwner():GetShootPos() )
             self.Core:Spawn()
         end
-        self.Core:SetParent(self.Owner)
-        self.Core:SetOwner(self.Owner)
+        self.Core:SetParent(self:GetOwner())
+        self.Core:SetOwner(self:GetOwner())
     end
 end
 
+-- REVIEW: This function uses a non-existent entity
+-- REVIEW: Unused function, leftover part of unfinished code
 function SWEP:GlowEffect()
     if SERVER then
         if !self.Glow then
             self.Glow = ents.Create("PhyscannonGlow")
-            self.Glow:SetPos( self.Owner:GetShootPos() )
+            self.Glow:SetPos( self:GetOwner():GetShootPos() )
             self.Glow:Spawn()
         end
-        self.Glow:SetParent(self.Owner)
-        self.Glow:SetOwner(self.Owner)
+        self.Glow:SetParent(self:GetOwner())
+        self.Glow:SetOwner(self:GetOwner())
     end
 end
 
+-- REVIEW: Part of unfinished code
 function SWEP:RemoveCore()
     if CLIENT then return end
     if !self.Core then return end
@@ -750,9 +769,13 @@ function SWEP:RemoveCore()
     self.Core = nil
 end
 
+-- REVIEW: Part of unfinished code
 function SWEP:RemoveGlow()
     if CLIENT then return end
     if !self.Glow then return end
     self.Glow:Remove()
     self.Glow = nil
 end
+
+
+
