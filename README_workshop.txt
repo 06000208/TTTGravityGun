@@ -2,6 +2,10 @@ The classic half life Gravity Gun as a trouble in terrorist town weapon. Addon a
 
 Shop icon is compliant with vanilla weapon icon design.
 
+Source code is [url=https://github.com/06000208/ttt-gravity-gun]available via the github repository[/url]
+
+If you experience any bugs or issues with the addon, or have suggestions like balance changes, feel free to post an issue on the [url=https://github.com/06000208/ttt-gravity-gun/issues]issue tracker[/url].
+
 [h1]Gameplay Mechanics[/h1]
 [quote=TTT Shop]A tractor beam-type weapon, originally designed for handling hazardous materials...[/quote] 
 [list]
@@ -11,16 +15,5 @@ Shop icon is compliant with vanilla weapon icon design.
   [*] Left click will punt the prop in the direction you're looking and consume 1 ammo
 [/list]
 
-[h1]Planned[/h1]
-[list]
-  [*] Mechanics overhaul & balance changes
-  [*] Visuals & aesthetics rework
-[/list]
-
-[h1]Source Code, Issues, Suggestions[/h1]
-You can find the source code in the github repository: https://github.com/06000208/ttt-gravity-gun
-
-If you have any errors, issues, etc. with the addon or any suggestions like balance changes, feel free to post an issue on the [url=https://github.com/06000208/ttt-gravity-gun/issues]issue tracker[/url].
-
 [h1]Credit[/h1]
-Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url] with permission, full credit to them for the original addon and a majority of the code!
+Addon adopted from [url=https://steamcommunity.com/profiles/76561197996267438]MKA0207[/url] with permission, full credit to them for the original addon!
