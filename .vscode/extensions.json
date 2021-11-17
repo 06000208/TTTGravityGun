@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "goz3rr.vscode-glualint",
-        "sumneko.lua"
+        "sumneko.lua",
+        "ExodiusStudios.comment-anchors"
     ]
 }
