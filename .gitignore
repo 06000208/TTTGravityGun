@@ -1,5 +1,5 @@
 archive/
 output/*
 !output/.gitkeep
-.gma
-.drawio
+*.gma
+*.drawio
