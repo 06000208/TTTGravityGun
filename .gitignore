@@ -2,3 +2,4 @@ archive/
 output/*
 !output/.gitkeep
 .gma
+.drawio
