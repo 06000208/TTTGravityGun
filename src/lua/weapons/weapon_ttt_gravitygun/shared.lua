@@ -47,6 +47,7 @@ SWEP.Secondary.Automatic = false
 SWEP.HoldType = "physgun"
 SWEP.UseHands = true
 SWEP.ViewModelFOV = 57
+SWEP.ViewModelFlip = false
 SWEP.ViewModel = "models/weapons/c_physcannon.mdl"
 SWEP.WorldModel = "models/weapons/w_physics.mdl"
 
@@ -71,7 +72,7 @@ local HoldSound = Sound("Weapon_MegaPhysCannon.HoldSound")
 -- This method overrides weapon_tttbase's Initialize()
 -- https://wiki.facepunch.com/gmod/WEAPON:Initialize
 function SWEP:Initialize()
-    -- Intentionally doesn't call BaseClass.Initialize(Self)
+    -- Intentionally doesn't call self.BaseClass.Initialize(Self)
     if SERVER then
         self:SetSkin(0) -- Orange Gravity Gun
     end
@@ -91,7 +92,7 @@ end
 -- This method overrides weapontttbase's Think()
 -- https://wiki.facepunch.com/gmod/WEAPON:Think
 function SWEP:Think()
-    BaseClass.Think(Self)
+    self.BaseClass.Think(self)
     local trace = self:GetOwner():GetEyeTrace()
     local tgt = trace.Entity
 
