@@ -100,7 +100,6 @@ function SWEP:Think()
     if math.random(  6,  98 ) == 16 and !self.TP and !self:GetOwner():KeyDown(IN_ATTACK2) and !self:GetOwner():KeyDown(IN_ATTACK) then
     --    self:ZapEffect()
     end
-    ]]
 
     if self:GetOwner():KeyPressed(IN_ATTACK2) then
         -- self:GlowEffect()
@@ -109,6 +108,7 @@ function SWEP:Think()
         self:RemoveGlow()
         -- self:CoreEffect()
     end
+    ]]
 
     if !self:GetOwner():KeyDown(IN_ATTACK) then
         self:SetNextPrimaryFire( CurTime() - 0.55 );
@@ -648,6 +648,23 @@ function SWEP:Visual()
     effectdata:SetAttachment( 1 )
     effectdata:SetEntity( self )
     util.Effect( "ToolTracer", effectdata )
+
+    --[[
+    if (SERVER) then
+        if !self.Muzzle then
+            self.Muzzle = ents.Create("PhyscannonMuzzle")
+            self.Muzzle:SetPos( self.Owner:GetShootPos() )
+            self.Muzzle:Spawn()
+        end
+
+        self.Muzzle:SetParent(self.Owner)
+        self.Muzzle:SetOwner(self.Owner)
+
+        timer.Simple( 0.12, function()
+            self:RemoveMuzzle()
+        end )
+    end
+    ]]
 
     local e = EffectData()
     e:SetMagnitude(30)
