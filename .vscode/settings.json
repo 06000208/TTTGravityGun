@@ -1,5 +1,7 @@
 {
     "editor.tabSize": 4,
+    "editor.wordWrap": "bounded",
+    "editor.wordWrapColumn": 120,
     "glualint.activeLanguages": [
         "glua",
         "lua"
